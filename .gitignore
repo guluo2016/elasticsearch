@@ -56,3 +56,6 @@ testfixtures_shared/
 
 # These are generated from .ci/jobs.t
 .ci/jobs/
+
+gradle/wrapper/gradle-6.3-all.zip
+gradle/wrapper/gradle-wrapper.properties
