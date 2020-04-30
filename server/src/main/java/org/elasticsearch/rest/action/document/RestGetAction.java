@@ -46,6 +46,10 @@ public class RestGetAction extends BaseRestHandler {
         return "document_get_action";
     }
 
+    /**
+     * 由RestGetAction处理的请求有GET HEAD
+     * @return
+     */
     @Override
     public List<Route> routes() {
         return List.of(

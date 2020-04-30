@@ -48,6 +48,30 @@ public class TransportMainAction extends HandledTransportAction<MainRequest, Mai
     @Override
     protected void doExecute(Task task, MainRequest request, ActionListener<MainResponse> listener) {
         ClusterState clusterState = clusterService.state();
+        /**
+         * 这个地方开始封装响应消息,所有的响应消息都在MainResponse对象中
+         * nodeName,Version.CURRENT都是要返回给用户的消息
+         */
+        /**
+         * 返回数据例子（6.7.1）
+         * {
+         *   "name" : "O5yzw5H",
+         *   "cluster_name" : "guluo",
+         *   "cluster_uuid" : "3PXsLGVsT7quebOjjYJATw",
+         *   "version" : {
+         *     "number" : "6.7.1",
+         *     "build_flavor" : "default",
+         *     "build_type" : "tar",
+         *     "build_hash" : "Unknown",
+         *     "build_date" : "2019-08-20T08:36:32.803351Z",
+         *     "build_snapshot" : true,
+         *     "lucene_version" : "7.7.0",
+         *     "minimum_wire_compatibility_version" : "5.6.0",
+         *     "minimum_index_compatibility_version" : "5.0.0"
+         *   },
+         *   "tagline" : "You Know, for Search"
+         * }
+         */
         listener.onResponse(
             new MainResponse(nodeName, Version.CURRENT, clusterState.getClusterName(),
                     clusterState.metadata().clusterUUID(), Build.CURRENT));

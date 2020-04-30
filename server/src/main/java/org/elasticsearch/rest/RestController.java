@@ -156,6 +156,10 @@ public class RestController implements HttpServerTransport.Dispatcher {
      * Registers a REST handler with the controller. The REST handler declares the {@code method}
      * and {@code path} combinations.
      */
+    /**
+     *注册调整到这里了
+     * @param restHandler
+     */
     public void registerHandler(final RestHandler restHandler) {
         restHandler.routes().forEach(route -> registerHandler(route.getMethod(), route.getPath(), restHandler));
         restHandler.deprecatedRoutes().forEach(route ->
