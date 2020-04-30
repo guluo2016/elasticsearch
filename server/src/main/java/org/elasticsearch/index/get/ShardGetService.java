@@ -171,6 +171,9 @@ public final class ShardGetService extends AbstractIndexShardComponent {
         fetchSourceContext = normalizeFetchSourceContent(fetchSourceContext, gFields);
 
         Term uidTerm = new Term(IdFieldMapper.NAME, Uid.encodeId(id));
+        /**
+         * 这里最终要的就是获取了lucene的indexReader对象，他保存在Engine.GetResult内部类中
+         */
         Engine.GetResult get = indexShard.get(new Engine.Get(realtime, realtime, id, uidTerm)
             .version(version).versionType(versionType).setIfSeqNo(ifSeqNo).setIfPrimaryTerm(ifPrimaryTerm));
         assert get.isFromTranslog() == false || realtime : "should only read from translog if realtime enabled";
@@ -184,6 +187,10 @@ public final class ShardGetService extends AbstractIndexShardComponent {
 
         try {
             // break between having loaded it from translog (so we only have _source), and having a document to load
+            /**
+             * 基于获取到的IndexReader对象，进行文档的获取，病将其封装成GetResult对象
+             * 注意不是Engine内部类GetResult
+             */
             return innerGetLoadFromStoredFields(id, gFields, fetchSourceContext, get, mapperService);
         } finally {
             get.close();
@@ -219,10 +226,13 @@ public final class ShardGetService extends AbstractIndexShardComponent {
             forceSourceForComputingTranslogStoredFields ? FetchSourceContext.FETCH_SOURCE : fetchSourceContext);
         if (fieldVisitor != null) {
             try {
+                //根据文档id获取一个能够访问指定文档的FieldVisitor对象
                 docIdAndVersion.reader.document(docIdAndVersion.docId, fieldVisitor);
             } catch (IOException e) {
                 throw new ElasticsearchException("Failed to get id [" + id + "]", e);
             }
+
+            //持有fieldVisitor对象之后，就可以获取文档中的内容
             source = fieldVisitor.source();
 
             // in case we read from translog, some extra steps are needed to make _source consistent and to load stored fields
@@ -307,6 +317,9 @@ public final class ShardGetService extends AbstractIndexShardComponent {
             }
         }
 
+        /**
+         * 封装获取到的文档结果
+         */
         return new GetResult(shardId.getIndexName(), id, get.docIdAndVersion().seqNo, get.docIdAndVersion().primaryTerm,
             get.version(), get.exists(), source, documentFields, metadataFields);
     }
