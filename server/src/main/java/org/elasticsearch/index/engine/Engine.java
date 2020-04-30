@@ -554,6 +554,10 @@ public abstract class Engine implements Closeable {
         final Engine.Searcher searcher = searcherFactory.apply("get", scope);
         final DocIdAndVersion docIdAndVersion;
         try {
+            /**
+             * searcher执行了ES的核心基础Lucene
+             * searcher.getIndexReader() 获取一个读索引对象
+             */
             docIdAndVersion = VersionsAndSeqNoResolver.loadDocIdAndVersion(searcher.getIndexReader(), get.uid(), true);
         } catch (Exception e) {
             Releasables.closeWhileHandlingException(searcher);
