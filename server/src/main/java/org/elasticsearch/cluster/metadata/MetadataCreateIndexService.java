@@ -254,6 +254,12 @@ public class MetadataCreateIndexService {
             if (response.isAcknowledged()) {
                 logger.trace("[{}] index creation acknowledged, waiting for active shards [{}]",
                     request.index(), request.waitForActiveShards());
+
+                /**
+                 * 创建索引的时候，会检查active shards的数量
+                 * 满足条件才可以创建索引
+                 * 如果不满足条件，那么会wait，等待request.ackTimeout()之后，还没有满足条件则直接返回
+                 */
                 activeShardsObserver.waitForActiveShards(new String[]{request.index()}, request.waitForActiveShards(), request.ackTimeout(),
                     shardsAcknowledged -> {
                         if (shardsAcknowledged == false) {
