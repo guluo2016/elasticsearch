@@ -138,10 +138,18 @@ public abstract class TransportReplicationAction<
 
         transportService.registerRequestHandler(actionName, ThreadPool.Names.SAME, requestReader, this::handleOperationRequest);
 
+
+        /**
+        注册handler，当主分片有写请求的时候，使用handlePrimaryRequest来进行处理
+        **/
         transportService.registerRequestHandler(transportPrimaryAction, executor, forceExecutionOnPrimary, true,
             in -> new ConcreteShardRequest<>(requestReader, in), this::handlePrimaryRequest);
 
         // we must never reject on because of thread pool capacity on replicas
+
+        /**
+        注册handler，当副本分片有写请求的时候，使用handleReplicaRequest来进行处理
+        **/
         transportService.registerRequestHandler(transportReplicaAction, executor, true, true,
             in -> new ConcreteReplicaRequest<>(replicaRequestReader, in), this::handleReplicaRequest);
 
@@ -368,6 +376,9 @@ public abstract class TransportReplicationAction<
                         onCompletionListener.onResponse(response);
                     }, e -> handleException(primaryShardReference, e));
 
+                    /**
+                     * 这里会执行ReplicationOperation.execute方法，进行真正的主分片写入操作
+                     */
                     new ReplicationOperation<>(primaryRequest.getRequest(), primaryShardReference,
                         ActionListener.map(responseListener, result -> result.finalResponseIfSuccessful),
                         newReplicasProxy(), logger, actionName, primaryRequest.getPrimaryTerm()).execute();
@@ -730,6 +741,10 @@ public abstract class TransportReplicationAction<
             performAction(node, actionName, false, request);
         }
 
+        /**
+        次方法会由performLocalAction调用，在进行调用的时候传入的参数是transportPrimaryAction
+        该参数的值为：p，因此请求会被一个能够处理primary的handler接收，这里就是本类中的handlePrimary**方法
+        **/
         private void performAction(final DiscoveryNode node, final String action, final boolean isPrimaryAction,
                                    final TransportRequest requestToPerform) {
             transportService.sendRequest(node, action, requestToPerform, transportOptions, new TransportResponseHandler<Response>() {
