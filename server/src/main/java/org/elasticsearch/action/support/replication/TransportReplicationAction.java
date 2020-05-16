@@ -663,6 +663,9 @@ public abstract class TransportReplicationAction<
                 assert request.waitForActiveShards() != ActiveShardCount.DEFAULT :
                     "request waitForActiveShards must be set in resolveRequest";
 
+                /**
+                 * 获取主分片信息
+                 */
                 final ShardRouting primary = state.getRoutingTable().shardRoutingTable(request.shardId()).primaryShard();
                 if (primary == null || primary.active() == false) {
                     logger.trace("primary shard [{}] is not yet active, scheduling a retry: action [{}], request [{}], "
@@ -676,10 +679,20 @@ public abstract class TransportReplicationAction<
                     retryBecauseUnavailable(request.shardId(), "primary shard isn't assigned to a known node.");
                     return;
                 }
+
+                /**
+                 * 获取主分片所在的节点信息
+                 */
                 final DiscoveryNode node = state.nodes().get(primary.currentNodeId());
                 if (primary.currentNodeId().equals(state.nodes().getLocalNodeId())) {
+                    /**
+                     * 点前节点就是主分片所在的节点
+                     */
                     performLocalAction(state, primary, node, indexMetadata);
                 } else {
+                    /**
+                     * 主分片在其他节点上
+                     */
                     performRemoteAction(state, primary, node);
                 }
             }

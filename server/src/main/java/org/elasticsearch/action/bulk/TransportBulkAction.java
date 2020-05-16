@@ -219,6 +219,12 @@ public class TransportBulkAction extends HandledTransportAction<BulkRequest, Bul
             final Map<String, IndexNotFoundException> indicesThatCannotBeCreated = new HashMap<>();
             Set<String> autoCreateIndices = new HashSet<>();
             ClusterState state = clusterService.state();
+
+            /**
+             * 添加文档
+             * 第一步：如果对应索引不存在，那么会自动创建一个所用createIndex
+             *         如果对应索引已经存在，那么直接执行executeBulk添加文档操作
+             */
             for (String index : indices) {
                 boolean shouldAutoCreate;
                 try {
@@ -233,8 +239,14 @@ public class TransportBulkAction extends HandledTransportAction<BulkRequest, Bul
             }
             // Step 3: create all the indices that are missing, if there are any missing. start the bulk after all the creates come back.
             if (autoCreateIndices.isEmpty()) {
+                /**
+                 *索引已经存在，直接添加文档
+                 */
                 executeBulk(task, bulkRequest, startTime, listener, responses, indicesThatCannotBeCreated);
             } else {
+                /**
+                 * 索引还不存在，首先创建一个索引
+                 */
                 final AtomicInteger counter = new AtomicInteger(autoCreateIndices.size());
                 for (String index : autoCreateIndices) {
                     createIndex(index, bulkRequest.preferV2Templates(), bulkRequest.timeout(), new ActionListener<>() {
@@ -512,6 +524,12 @@ public class TransportBulkAction extends HandledTransportAction<BulkRequest, Bul
                 if (task != null) {
                     bulkShardRequest.setParentTask(nodeId, task.getId());
                 }
+
+                /**
+                 * 这里需要注意，最终Bulk Action会由TransportShardBulkAction来进行处理
+                 * 这里的一系列调用之后，会调用TransportShardBulkAction.doExecute
+                 * doExecute在TransportAction中定义，由其子类实现
+                 */
                 client.executeLocally(TransportShardBulkAction.TYPE, bulkShardRequest, new ActionListener<>() {
                     @Override
                     public void onResponse(BulkShardResponse bulkShardResponse) {

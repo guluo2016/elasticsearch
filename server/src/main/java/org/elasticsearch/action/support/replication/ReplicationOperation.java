@@ -106,6 +106,10 @@ public class ReplicationOperation<
 
         totalShards.incrementAndGet();
         pendingActions.incrementAndGet(); // increase by 1 until we finish all primary coordination
+
+        /**
+         * 这一步非常关键，在执行完主分片的写入之后，会执行handlePrimaryResult方法，实现对副本分片的写入操作
+         */
         primary.perform(request, ActionListener.wrap(this::handlePrimaryResult, resultListener::onFailure));
     }
 
