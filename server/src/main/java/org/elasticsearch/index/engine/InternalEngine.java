@@ -845,6 +845,9 @@ public class InternalEngine extends Engine {
     public IndexResult index(Index index) throws IOException {
         assert Objects.equals(index.uid().field(), IdFieldMapper.NAME) : index.uid().field();
         final boolean doThrottle = index.origin().isRecovery() == false;
+        /**
+         * 写入数据，先上写锁
+         */
         try (ReleasableLock releasableLock = readLock.acquire()) {
             ensureOpen();
             assert assertIncomingSequenceNumber(index.origin(), index.seqNo());

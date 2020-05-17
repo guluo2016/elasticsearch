@@ -31,6 +31,7 @@ import org.elasticsearch.action.support.TransportActions;
 import org.elasticsearch.cluster.action.shard.ShardStateAction;
 import org.elasticsearch.cluster.routing.IndexShardRoutingTable;
 import org.elasticsearch.cluster.routing.ShardRouting;
+import org.elasticsearch.common.CheckedConsumer;
 import org.elasticsearch.common.Nullable;
 import org.elasticsearch.common.io.stream.StreamInput;
 import org.elasticsearch.index.seqno.SequenceNumbers;
@@ -46,6 +47,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Consumer;
 import java.util.function.LongSupplier;
 
 public class ReplicationOperation<
