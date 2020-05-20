@@ -116,6 +116,9 @@ public class TransportShardBulkActionTests extends IndexShardTestCase {
         randomlySetIgnoredPrimaryResponse(primaryRequest);
 
         BulkPrimaryExecutionContext context = new BulkPrimaryExecutionContext(bulkShardRequest, shard);
+        /**
+         * 往不存在的索引中添加一个文档
+         */
         TransportShardBulkAction.executeBulkItemRequest(context, null, threadPool::absoluteTimeInMillis,
             new NoopMappingUpdatePerformer(), listener -> {}, ASSERTING_DONE_LISTENER);
         assertFalse(context.hasMoreOperationsToExecute());
@@ -142,7 +145,7 @@ public class TransportShardBulkActionTests extends IndexShardTestCase {
         randomlySetIgnoredPrimaryResponse(primaryRequest);
 
         BulkPrimaryExecutionContext secondContext = new BulkPrimaryExecutionContext(bulkShardRequest, shard);
-        TransportShardBulkAction.executeBulkItemRequest(secondContext, null,
+        boolean r = TransportShardBulkAction.executeBulkItemRequest(secondContext, null,
             threadPool::absoluteTimeInMillis, new ThrowingMappingUpdatePerformer(new RuntimeException("fail")),
             listener -> {}, ASSERTING_DONE_LISTENER);
         assertFalse(context.hasMoreOperationsToExecute());

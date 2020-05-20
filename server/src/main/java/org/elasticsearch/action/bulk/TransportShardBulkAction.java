@@ -238,6 +238,9 @@ public class TransportShardBulkAction extends TransportWriteAction<BulkShardRequ
             }
             // execute translated update request
             switch (updateResult.getResponseResult()) {
+                /**
+                 * CREATE和UPDATE走的是一样的逻辑，ES中实际上也是没有修改的
+                 */
                 case CREATED:
                 case UPDATED:
                     IndexRequest indexRequest = updateResult.action();
@@ -350,6 +353,12 @@ public class TransportShardBulkAction extends TransportWriteAction<BulkShardRequ
         } else {
             if (isFailed) {
                 final Exception failure = executionResult.getFailure().getCause();
+                /**
+                 * 会出现失败的例子
+                 * 如：写入超时，这个可能的原因是：
+                 * 1) 一个节点上的分片数太多，节点管理者写分片都有点吃力，当又有写数据请求来临就会非常耗时，导致超时失败
+                 * 2) 一个索引的字段太多了，写一个文档都非常费劲，导致超时
+                 */
                 final MessageSupplier messageSupplier = () -> new ParameterizedMessage("{} failed to execute bulk item ({}) {}",
                     context.getPrimary().shardId(), opType.getLowercase(), docWriteRequest);
                 if (TransportShardBulkAction.isConflictException(failure)) {

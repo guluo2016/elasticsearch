@@ -66,6 +66,7 @@ import java.util.stream.StreamSupport;
  * <p>
  * The cluster state object is immutable with the exception of the {@link RoutingNodes} structure, which is
  * built on demand from the {@link RoutingTable}.
+ * 集群状态的更改，只能是由master来进行
  * The cluster state can be updated only on the master node. All updates are performed by on a
  * single thread and controlled by the {@link ClusterService}. After every update the
  * {@link Discovery#publish} method publishes a new version of the cluster state to all other nodes in the
