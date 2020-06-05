@@ -70,6 +70,10 @@ import java.util.stream.Stream;
 
 import static org.elasticsearch.common.util.concurrent.EsExecutors.daemonThreadFactory;
 
+/**
+ * 负责管理需要对集群任务进行处理的模块(Appiler)和监听器(Listener)
+ * 以及通知各个Applier应用集群的状态
+ */
 public class ClusterApplierService extends AbstractLifecycleComponent implements ClusterApplier {
     private static final Logger logger = LogManager.getLogger(ClusterApplierService.class);
 

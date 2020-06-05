@@ -222,6 +222,9 @@ public class ClusterService extends AbstractLifecycleComponent {
      */
     public <T extends ClusterStateTaskConfig & ClusterStateTaskExecutor<T> & ClusterStateTaskListener>
         void submitStateUpdateTask(String source, T updateTask) {
+        /**
+         * updateTaskd 的类型为T，因此必须是ClusterStateTaskConfig & ClusterStateTaskExecutor<T> & ClusterStateTaskListener的子类
+         */
         submitStateUpdateTask(source, updateTask, updateTask, updateTask, updateTask);
     }
 

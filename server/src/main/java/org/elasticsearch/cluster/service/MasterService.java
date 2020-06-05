@@ -70,6 +70,15 @@ import java.util.stream.Collectors;
 
 import static org.elasticsearch.common.util.concurrent.EsExecutors.daemonThreadFactory;
 
+/**
+ * 负责集群的任务管理、运行工作
+ * 内部实际上是维护了一个线程池，用于执行用户提交的这些集群管理、运行任务
+ * 比较重要的方法有：
+ * pendingTasks 返回待执行的任务列表
+ * submitStateUpdateTask 提交集群任务
+ * numberOfPendingTasks 返回待执行的任务数量
+ *
+ */
 public class MasterService extends AbstractLifecycleComponent {
     private static final Logger logger = LogManager.getLogger(MasterService.class);
 
@@ -122,6 +131,10 @@ public class MasterService extends AbstractLifecycleComponent {
     }
 
     protected PrioritizedEsThreadPoolExecutor createThreadPoolExecutor() {
+        /**
+         * 创建一个仅有一个线程的线程池，该线程支持优先级
+         * 线程池的名字是：masterService#updateTask
+         */
         return EsExecutors.newSinglePrioritizing(
                 nodeName + "/" + MASTER_UPDATE_THREAD_NAME,
                 daemonThreadFactory(nodeName, MASTER_UPDATE_THREAD_NAME),
