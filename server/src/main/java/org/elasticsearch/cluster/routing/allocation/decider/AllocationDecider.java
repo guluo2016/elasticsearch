@@ -31,6 +31,15 @@ import org.elasticsearch.cluster.routing.allocation.decider.Decision.Type;
  * dynamic cluster- or index-wide shard allocation decisions on a per-node
  * basis.
  */
+
+/**
+ * Shard Allocation 分片分配机制
+ * ES中触发进行分片分配的条件有如下
+ * 1) 创建或者删除一个索引
+ * 2) Node加入集群或者离开集群
+ * 3) 手动执行Reroute
+ * 4) 修改索引配置:为索引增加了副本分片
+ */
 public abstract class AllocationDecider {
     /**
      * Returns a {@link Decision} whether the given shard routing can be
@@ -38,6 +47,10 @@ public abstract class AllocationDecider {
      * {@link Decision#ALWAYS}.
      */
     public Decision canRebalance(ShardRouting shardRouting, RoutingAllocation allocation) {
+        /**
+         * 在进行分片分配的时候，是否考虑负载均衡
+         * 默认情况下始终考虑
+         */
         return Decision.ALWAYS;
     }
 

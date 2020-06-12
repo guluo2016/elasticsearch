@@ -463,6 +463,9 @@ public class BalancedShardsAllocator implements ShardsAllocator {
          * to {@code 0.0}
          */
         private void balanceByWeights() {
+            /**
+             * 实现负载均衡的计算公式
+             */
             final AllocationDeciders deciders = allocation.deciders();
             final ModelNode[] modelNodes = sorter.modelNodes;
             final float[] weights = sorter.weights;
