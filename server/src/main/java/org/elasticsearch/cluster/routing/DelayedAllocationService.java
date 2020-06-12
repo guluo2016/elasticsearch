@@ -65,6 +65,10 @@ public class DelayedAllocationService extends AbstractLifecycleComponent impleme
     /**
      * represents a delayed scheduling of the reroute action that can be cancelled.
      */
+    /**
+     * 定义一个集群层面的任务，直接继承自ClusterStateUpdateTask抽象类
+     *
+     */
     class DelayedRerouteTask extends ClusterStateUpdateTask {
         final TimeValue nextDelay; // delay until submitting the reroute command
         final long baseTimestampNanos; // timestamp (in nanos) upon which delay was calculated
@@ -108,12 +112,19 @@ public class DelayedAllocationService extends AbstractLifecycleComponent impleme
 
         @Override
         public ClusterState execute(ClusterState currentState) throws Exception {
+            /**
+             * 用于定义要执行的具体任务
+             */
             removeIfSameTask(this);
             return allocationService.reroute(currentState, "assign delayed unassigned shards");
         }
 
         @Override
         public void clusterStateProcessed(String source, ClusterState oldState, ClusterState newState) {
+            /**
+             * 集群状态处理完毕后的回调
+             * 当集群状态已经全部为Appliers和Listeners处理完毕后调用
+             */
             if (oldState == newState) {
                 // no state changed, check when we should remove the delay flag from the shards the next time.
                 // if cluster state changed, we can leave the scheduling of the next delay up to the clusterChangedEvent
@@ -124,6 +135,9 @@ public class DelayedAllocationService extends AbstractLifecycleComponent impleme
 
         @Override
         public void onFailure(String source, Exception e) {
+            /**
+             * 任务执行失败后的回调函数
+             */
             removeIfSameTask(this);
             logger.warn("failed to schedule/execute reroute post unassigned shard", e);
         }

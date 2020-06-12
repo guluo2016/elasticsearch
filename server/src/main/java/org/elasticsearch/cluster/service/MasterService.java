@@ -224,12 +224,20 @@ public class MasterService extends AbstractLifecycleComponent {
         }
 
         final long computationStartTime = threadPool.relativeTimeInMillis();
+        /**
+         * 执行任务，并获取执行的结果，以TaskOutput表示
+         */
         final TaskOutputs taskOutputs = calculateTaskOutputs(taskInputs, previousClusterState);
         taskOutputs.notifyFailedTasks();
         final TimeValue computationTime = getTimeSince(computationStartTime);
         logExecutionTime(computationTime, "compute cluster state update", summary);
 
-        if (taskOutputs.clusterStateUnchanged()) {
+
+        /**
+         * 如果在执行完taskInput任务后，集群的状态发生变化的话，需要更新集群状态
+         * 具体做法就是广播到集群的各个节点，进行通知
+         */
+        if (taskOutputs.clusterStateUnchanged()) {  //unchange
             final long notificationStartTime = threadPool.relativeTimeInMillis();
             taskOutputs.notifySuccessfulTasksOnUnchangedClusterState();
             final TimeValue executionTime = getTimeSince(notificationStartTime);
@@ -255,6 +263,10 @@ public class MasterService extends AbstractLifecycleComponent {
                 }
 
                 logger.debug("publishing cluster state version [{}]", newClusterState.version());
+
+                /**
+                 * 集群状态发生变化了，需要publish
+                 */
                 publish(clusterChangedEvent, taskOutputs, publicationStartTime);
             } catch (Exception e) {
                 handleException(summary, publicationStartTime, newClusterState, e);
@@ -278,8 +290,14 @@ public class MasterService extends AbstractLifecycleComponent {
         // indefinitely wait for publication to complete
         try {
             FutureUtils.get(fut);
+            /**
+             * 成功，执行成功回调函数
+             */
             onPublicationSuccess(clusterChangedEvent, taskOutputs);
         } catch (Exception e) {
+            /**
+             * 失败，执行失败回调函数
+             */
             onPublicationFailed(clusterChangedEvent, taskOutputs, startTimeMillis, e);
         }
     }

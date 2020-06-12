@@ -26,6 +26,18 @@ import org.elasticsearch.common.unit.TimeValue;
 import java.util.List;
 
 /**
+ * 这个类是一个典型的ES集群层面任务抽象封装类
+ * 想要往集群上提交任务的话，这个任务需要实现ClusterStateTaskConfig, ClusterStateTaskExecutor, ClusterStateTaskListener
+ * 可以参看{@link org.elasticsearch.cluster.service.ClusterService}的submitStateUpdateTask放大
+ *
+ *
+ * ClusterStateTaskListener：定义了在提交任务时所需要的回调函数
+ * ClusterStateTaskExecutor：定义了需要执行的任务
+ * ClusterStateTaskConfig：定义了任务的配置信息，如超时时间、任务优先级
+ *
+ */
+
+/**
  * A task that can update the cluster state.
  */
 public abstract class ClusterStateUpdateTask
