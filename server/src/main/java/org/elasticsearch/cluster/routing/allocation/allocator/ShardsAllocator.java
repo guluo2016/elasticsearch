@@ -33,12 +33,18 @@ import org.elasticsearch.cluster.routing.allocation.ShardAllocationDecision;
  * </p>
  */
 public interface ShardsAllocator {
+/**
+ * 负责Shard的分配，集群层面的分配者，它的实现类是{@link BalancedShardsAllocator}
+ */
+
 
     /**
      * Allocates shards to nodes in the cluster. An implementation of this method should:
      * - assign unassigned shards
      * - relocate shards that cannot stay on a node anymore
      * - relocate shards to find a good shard balance in the cluster
+     *
+     *  定义分片的分配方法
      *
      * @param allocation current node allocation
      */
@@ -56,6 +62,9 @@ public interface ShardsAllocator {
      *
      * If an implementation of this interface does not support explaining decisions for a single shard through
      * the cluster explain API, then this method should throw a {@code UnsupportedOperationException}.
+     *
+     * 决定分片分配到哪里
+     *
      */
     ShardAllocationDecision decideShardAllocation(ShardRouting shard, RoutingAllocation allocation);
 }

@@ -65,6 +65,8 @@ import java.util.stream.StreamSupport;
 import static org.elasticsearch.cluster.routing.ShardRoutingState.RELOCATING;
 
 /**
+ * 基于负载均衡方式进行Shard的分配，何时进行负载均衡操作的依据就是WeightFunction
+ *
  * The {@link BalancedShardsAllocator} re-balances the nodes allocations
  * within an cluster based on a {@link WeightFunction}. The clusters balance is defined by four parameters which can be set
  * in the cluster update API that allows changes in real-time:
