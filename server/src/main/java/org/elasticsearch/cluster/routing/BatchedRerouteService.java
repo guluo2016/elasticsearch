@@ -93,6 +93,9 @@ public class BatchedRerouteService implements RerouteService {
             }
         }
         try {
+            /**
+             * 重新路由属于集群层面的操作，因此需要封装任务交给ClusterService来执行
+             */
             clusterService.submitStateUpdateTask(CLUSTER_UPDATE_TASK_SOURCE + "(" + reason + ")",
                 new ClusterStateUpdateTask(priority) {
 

@@ -439,6 +439,9 @@ public class Coordinator extends AbstractLifecycleComponent implements Discovery
 
 
     private void handleJoinRequest(JoinRequest joinRequest, JoinHelper.JoinCallback joinCallback) {
+        /**
+         * 当有新节点加入时，会发送Join请求，这个请求最终会被此方法执行
+         */
         assert Thread.holdsLock(mutex) == false;
         assert getLocalNode().isMasterNode() : getLocalNode() + " received a join but is not master-eligible";
         logger.trace("handleJoinRequest: as {}, handling {}", mode, joinRequest);
@@ -462,6 +465,9 @@ public class Coordinator extends AbstractLifecycleComponent implements Discovery
                 }
                 sendValidateJoinRequest(stateForJoinValidation, joinRequest, joinCallback);
             } else {
+                /**
+                 * 执行此方法
+                 */
                 processJoinRequest(joinRequest, joinCallback);
             }
         }, joinCallback::onFailure));
@@ -499,6 +505,11 @@ public class Coordinator extends AbstractLifecycleComponent implements Discovery
             final boolean prevElectionWon = coordState.electionWon();
 
             optionalJoin.ifPresent(this::handleJoin);
+
+            /**
+             * 执行此方法
+             * joinAccumulator会执行LeaderJoinAccumulator类的实现方法
+             */
             joinAccumulator.handleJoinRequest(joinRequest.getSourceNode(), joinCallback);
 
             if (prevElectionWon == false && coordState.electionWon()) {

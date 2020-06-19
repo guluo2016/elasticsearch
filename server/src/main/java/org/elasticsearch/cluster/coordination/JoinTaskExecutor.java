@@ -96,9 +96,13 @@ public class JoinTaskExecutor implements ClusterStateTaskExecutor<JoinTaskExecut
 
     @Override
     public ClusterTasksResult<Task> execute(ClusterState currentState, List<Task> joiningNodes) throws Exception {
+        /**
+         * 执行节点加入集群操作之后，集群的状态可能会发生变化
+         */
         final ClusterTasksResult.Builder<Task> results = ClusterTasksResult.builder();
 
         final DiscoveryNodes currentNodes = currentState.nodes();
+        //标识符
         boolean nodesChanged = false;
         ClusterState.Builder newState;
 
@@ -160,6 +164,9 @@ public class JoinTaskExecutor implements ClusterStateTaskExecutor<JoinTaskExecut
         }
 
         if (nodesChanged) {
+            /**，就需要执行RerouteService服务的reroute方法，进行重新路由
+             * 一旦节点发生了变化
+             */
             rerouteService.reroute("post-join reroute", Priority.HIGH, ActionListener.wrap(
                 r -> logger.trace("post-join reroute completed"),
                 e -> logger.debug("post-join reroute failed", e)));

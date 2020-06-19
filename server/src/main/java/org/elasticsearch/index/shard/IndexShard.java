@@ -2508,6 +2508,9 @@ public class IndexShard extends AbstractIndexShardComponent implements IndicesCl
         switch (recoveryState.getRecoverySource().getType()) {
             case EMPTY_STORE:
             case EXISTING_STORE:
+                /**
+                 * 主分片从本地恢复
+                 */
                 executeRecovery("from store", recoveryState, recoveryListener, this::recoverFromStore);
                 break;
             case PEER:

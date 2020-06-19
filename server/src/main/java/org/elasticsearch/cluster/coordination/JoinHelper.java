@@ -344,6 +344,10 @@ public class JoinHelper {
     class LeaderJoinAccumulator implements JoinAccumulator {
         @Override
         public void handleJoinRequest(DiscoveryNode sender, JoinCallback joinCallback) {
+            /**
+             * 这里封装一个task，task的职责就是将新的节点加入到集群上
+             * 任务提封装在JoinTaskExecutor中的execute方法中
+             */
             final JoinTaskExecutor.Task task = new JoinTaskExecutor.Task(sender, "join existing leader");
             masterService.submitStateUpdateTask("node-join", task, ClusterStateTaskConfig.build(Priority.URGENT),
                 joinTaskExecutor, new JoinTaskListener(task, joinCallback));

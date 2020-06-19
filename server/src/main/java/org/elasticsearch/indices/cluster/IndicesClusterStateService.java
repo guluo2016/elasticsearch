@@ -239,6 +239,9 @@ public class IndicesClusterStateService extends AbstractLifecycleComponent imple
 
         createIndices(state);
 
+        /**
+         * 进行Recovery
+         */
         createOrUpdateShards(state);
     }
 
